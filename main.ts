@@ -1,25 +1,16 @@
 const State = {
-    CALIBRATION: 0,
-    PLAYING: 1,
-    GAME_OVER: 2,
-    CONFIG_DIFFICULTY: 3
+    PRECALIBRATION: 0,
+    CALIBRATION: 1,
+    PLAYING: 2,
+    GAME_OVER: 3,
+    CONFIG_DIFFICULTY: 4
 }
 
-const LAST_STATE = 3
-
-let state = State.CALIBRATION
+let state = State.PRECALIBRATION
 
 let accelerationThreshold = 750
-let gyroThreshold = 1
 
 input.setAccelerometerRange(AcceleratorRange.TwoG)
-
-function advanceState() {
-    state += 1
-    if (state > LAST_STATE) {
-        state = 0
-    }
-}
 
 function getTotalAcceleration(base:number) {
     let ax = input.acceleration(Dimension.X)
@@ -28,50 +19,45 @@ function getTotalAcceleration(base:number) {
     return (Math.abs(ax) + Math.abs(ay) + Math.abs(az)) - base
 }
 
-function getTotalGyro() {
-    let gyro = 0
-    gyro += input.rotation(Rotation.Pitch)
-    gyro += input.rotation(Rotation.Roll)
-    return gyro
-}
-
 input.onLogoEvent(TouchButtonEvent.Pressed, function() {
-    advanceState()
+    if (state == State.CONFIG_DIFFICULTY) {
+        state == State.PRECALIBRATION
+    } else {
+        state == State.CONFIG_DIFFICULTY
+    }
 })
 
 let time = 0
 let totalAcceleration = 0
 let base = 0
 
-
-
-
-
 while (true) {
-    if (input.buttonIsPressed(Button.A)) {
+    if (state == State.PRECALIBRATION) {
+        while (true) {
+            if (input.buttonIsPressed(Button.A)) {
+                basic.showLeds(`
+                . . # . .
+                . . # . .
+                . . # . .
+                . . # . .
+                . . # . .
+                `)
+                break
+            }
+        }
+
+        basic.pause(1000)
+
         basic.showLeds(`
-        . . # . .
-        . . # . .
-        . . # . .
-        . . # . .
-        . . # . .
-        `)
-        break
+                # # # # #
+                . # # # .
+                . . # . .
+                . # # # .
+                # # # # #
+                `)
+        state = State.CALIBRATION
     }
-}
-
-basic.pause(1000)
-
-basic.showLeds(`
-        # # # # #
-        . # # # .
-        . . # . .
-        . # # # .
-        # # # # #
-        `)
-
-while (true) {
-    if (state == State.CALIBRATION) {
+    else if (state == State.CALIBRATION) {
         if (time < 3000) {
             totalAcceleration += getTotalAcceleration(0)
             time += 50
@@ -98,9 +84,17 @@ while (true) {
             state = State.GAME_OVER
         }
     } else if (state == State.GAME_OVER) {
-        if (input.buttonIsPressed(Button.A)) {
+        if (input.buttonIsPressed(Button.B)) {
             control.reset()
         }
+    } else if (state == State.CONFIG_DIFFICULTY) {
+        basic.showLeds(`
+            # . . . #
+            . # # # .
+            . # . # .
+            . # # # .
+            # . . . #
+        `)        
     }
     basic.pause(50)
 }
