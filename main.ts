@@ -30,7 +30,7 @@ let basez = 0
 
 input.setAccelerometerRange(AcceleratorRange.TwoG)
 
-function getTotalAcceleration(basex: number, basey: number, basez: number) {
+function getBaseAcceleration(basex: number, basey: number, basez: number) {
     let ax = input.acceleration(Dimension.X)
     let ay = input.acceleration(Dimension.Y)
     let az = input.acceleration(Dimension.Z)
@@ -145,7 +145,7 @@ while (true) {
             time = 0
         }
     } else if (state == State.PLAYING) {
-        let totalAcceleration = getTotalAcceleration(basex, basey, basez)
+        let totalAcceleration = getBaseAcceleration(basex, basey, basez)
         let dangerLevelX = totalAcceleration[0] / accelerationThreshold
         let dangerLevelY = totalAcceleration[1] / accelerationThreshold
         let dangerLevelZ = totalAcceleration[2] / accelerationThreshold
