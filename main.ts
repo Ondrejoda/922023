@@ -146,9 +146,10 @@ while (true) {
         }
     } else if (state == State.PLAYING) {
         let totalAcceleration = getBaseAcceleration(basex, basey, basez)
-        let dangerLevelX = totalAcceleration[0] / accelerationThreshold
-        let dangerLevelY = totalAcceleration[1] / accelerationThreshold
-        let dangerLevelZ = totalAcceleration[2] / accelerationThreshold
+        let dangerLevels = totalAcceleration.map(x => x / accelerationThreshold)
+        let dangerLevelX = dangerLevels[0]
+        let dangerLevelY = dangerLevels[1]
+        let dangerLevelZ = dangerLevels[2]
 
         let currentDangerCase = DangerCase.NONE
 
